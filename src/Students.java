@@ -33,7 +33,7 @@ public class Students {
 	JButton edit;
 	JButton delete;
 	JButton add;
-	
+	static String c;
 	public void studentView() throws SQLException {
 		
 		Font text = new Font("Times New Roman", Font.PLAIN, 18);
@@ -150,6 +150,8 @@ public class Students {
 		JComboBox clss= new JComboBox(classEt());
 		clss.setBounds(350, 60, 50, 25);
 		clss.setEnabled(false);
+		Object selectedClassObject = clss.getSelectedItem();
+		 c = (selectedClassObject != null) ? selectedClassObject.toString() : "";
 		layeredPane.add(clss, JLayeredPane.MODAL_LAYER);
 		//------------------------------------------------------------
 		

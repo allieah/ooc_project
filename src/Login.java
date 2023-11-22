@@ -21,14 +21,20 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class Login {
 
-    int usr = 0;
-
+    public static final int res = 0;
+	int usr = 0;
+    GenerateTimetable table = new GenerateTimetable();
     public void loginView() {
         JFrame frame = new JFrame();
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(true); // Make the text area read-only
+        JScrollPane scrollPane = new JScrollPane(textArea);
         Font text = new Font("Arial", Font.PLAIN, 20); // Changed font to Arial
 
         // Using more vibrant colors
@@ -37,7 +43,7 @@ public class Login {
 
         Home hm = new Home();
         TeacherView tview = new TeacherView();
-        StudentView sview = new StudentView();
+      //  StudentView sview = new StudentView();
         
         // Create a layered pane to hold components with different layers
         JLayeredPane layeredPane = new JLayeredPane();
@@ -192,7 +198,9 @@ public class Login {
                         else if (res == 2)
                             tview.tcView(usr);
                         else if (res == 3)
-                            sview.stView(usr);
+                        	
+                       // 	GenerateTimetable table=new GenerateTimetable();
+                        	table.displayTimetable(textArea);
 
                         frame.dispose();
                     }

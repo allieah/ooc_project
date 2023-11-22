@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,57 +34,43 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-//import TimetableGenerator.Subject;
-//import TimetableGenerator.Timetable;
 
-public class GenerateTimetable extends JFrame{
+
+public class GenerateTimetable extends JFrame {
 	Connection con;
 	DefaultTableModel model = new DefaultTableModel();
-	
-	 private int days = 0;
+	  private int days = 0;
 	    private int numSubjects = 0;
 	    private List<Subject> subjects = new ArrayList<>();
 	    private List<String> classTimings = new ArrayList<>();
-	    private Timetable timetable ;
-	   
+	    private Timetable timetable = null;
 
 	
 
-    void generateTimetable() {
+    void generateTimetable() throws SQLException {
         
         
             JTextField daysField = new JTextField();
             JTextField numSubjectsField = new JTextField();
-            JTextField classNameField = new JTextField();
+            JTextField clss = new JTextField();
+        
             JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+            inputPanel.add(new JLabel("Enter the class:"));
+            inputPanel.add(clss);
             inputPanel.add(new JLabel("Enter the number of days in the timetable:"));
             inputPanel.add(daysField);
             inputPanel.add(new JLabel("Enter the number of subjects:"));
             inputPanel.add(numSubjectsField);
-            inputPanel.add(new JLabel("Enter the class name:"));
-           inputPanel.add(classNameField);
-
-            int classResult = JOptionPane.showConfirmDialog(this, inputPanel, "Class Details", JOptionPane.OK_CANCEL_OPTION);
-
-            if (classResult != JOptionPane.OK_OPTION) {
-                JOptionPane.showMessageDialog(this, "Class name not entered. Cannot generate timetable.");
-                return;
-            }
-
-            String className = classNameField.getText().trim();
-
-            if (className.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid class name.");
-                return;
-            }
-
+  
             int result = JOptionPane.showConfirmDialog(this, inputPanel, "Generate Timetable", JOptionPane.OK_CANCEL_OPTION);
         
             if (result == JOptionPane.OK_OPTION) {
                 try {
                     days = Integer.parseInt(daysField.getText());
                     numSubjects = Integer.parseInt(numSubjectsField.getText());
-        
+                    String className=clss.getText();
+                    
+                    System.out.println(className+"classesssss\n");
                     if (days <= 0 || numSubjects <= 0) {
                         JOptionPane.showMessageDialog(this, "Please enter valid numbers for days and subjects.");
                         return;
@@ -121,72 +108,123 @@ public class GenerateTimetable extends JFrame{
                     }
         
                     classTimings.add("9:30 AM - 10:30 AM");
-                    classTimings.add("10:30 AM - 11:30 AM"); 
+                    classTimings.add("10:30 AM - 11:30 AM");
                     classTimings.add("11:30 AM - 12:30 PM");
                     classTimings.add("01:30 PM - 02:30 PM");
                     classTimings.add("02:30 PM - 03:30 PM");
                     classTimings.add("03:30 PM - 04:30 PM");
                     classTimings.add("04:30 PM - 05:30 PM");
-        
+                    System.out.println(className+"class1\n");
+                    int classId = retrieveClassId(className);
                     timetable = new Timetable(days, classTimings.size());
         
                     Random random = new Random();
                     int subjectIndex = 0;
         
-                    for (int day = 0; day < days; day++) {
-                        List<String> assignedSubjects = new ArrayList<>(); // To keep track of assigned subjects
-        
-                        for (int classIndex = 0; classIndex < classTimings.size(); classIndex++) {
-                            Subject subject = subjects.get(subjectIndex);
-        
-                            if (subject.credits > 0) {
-                                // Check if the slot is available and before 12:30
-                                if (classIndex < 3 && timetable.getClass(day, classIndex) == null) {
+                    connect();
+                    String insertQuery = "INSERT INTO timetables (day, classId, t1, t2, t3, t4, t5, t6, t7) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    try (PreparedStatement preparedStatement = con.prepareStatement(insertQuery)) {
+                        for (int day = 0; day < days; day++) {
+                            preparedStatement.setInt(1, day + 1); // Set day for the current batch
+
+                            List<String> assignedSubjects = new ArrayList<>(); // To keep track of assigned subjects
+
+                            for (int classIndex = 0; classIndex < classTimings.size(); classIndex++) {
+                                Subject subject = subjects.get(subjectIndex);
+
+                                if (subject.credits > 0) {
                                     // Check if the subject is not already assigned on the same day
                                     if (!assignedSubjects.contains(subject.name)) {
-                                        timetable.addClass(day, classIndex, subject.name);
+                                        // Assign the subject to the time slot
+                                        preparedStatement.setInt(2, classId); // Set classId (You need to implement generateUniqueId)
+                                        preparedStatement.setString(classIndex + 3, subject.name); // +3 because the first two parameters are 'day' and 'classId'
                                         subject.credits--;
                                         assignedSubjects.add(subject.name);
+                                    } else {
+                                        // If subject is already assigned or no subject available, set the column value to NULL
+                                        preparedStatement.setNull(classIndex + 3, Types.VARCHAR);
                                     }
+                                } else {
+                                    // If no subjects are available, set the column value to NULL
+                                    preparedStatement.setNull(classIndex + 3, Types.VARCHAR);
                                 }
+
+                                subjectIndex = (subjectIndex + 1) % numSubjects;
                             }
-        
-                            subjectIndex = (subjectIndex + 1) % numSubjects;
+
+                            preparedStatement.addBatch(); // Add the current batch
                         }
+
+                        preparedStatement.executeBatch(); // Execute all batches
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
         
                     JOptionPane.showMessageDialog(this, "Timetable generated successfully.");
+                  
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(this, "Please enter valid numbers for days and subjects.");
                 }
             }
-//            int classId = 0; // Initialize classId here
-            try {
-                connect();
-
-                int classId = retrieveClassId(className);
-
-                // Ensure classId is initialized before calling insertTimetable
-                if (classId != -1) {
-                    insertTimetable(classId, timetable.getTimetableData());
-                    JOptionPane.showMessageDialog(this, "Timetable generated and stored in the database successfully.");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error retrieving class ID. Cannot store timetable data.");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error storing timetable data in the database.");
-            }
+        
+        
         
         
     }
+   
+	
+    void displayTimetable(JTextArea textArea) throws SQLException {
 
-	//*****
+  	  if (classTimings.size() ==0) {
+  		  classTimings.add("9:30 AM - 10:30 AM");
+            classTimings.add("10:30 AM - 11:30 AM");
+            classTimings.add("11:30 AM - 12:30 PM");
+            classTimings.add("01:30 PM - 02:30 PM");
+            classTimings.add("02:30 PM - 03:30 PM");
+            classTimings.add("03:30 PM - 04:30 PM");
+            classTimings.add("04:30 PM - 05:30 PM");
+  	  }
+  	  days=3;
+  	  
+  	JTextField clss = new JTextField();
+  	JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+  	inputPanel.add(new JLabel("Enter the class:"));
+  	inputPanel.add(clss);
+  	
+  	int result = JOptionPane.showConfirmDialog(this, inputPanel, "Display Timetable", JOptionPane.OK_CANCEL_OPTION);
+System.out.println(classTimings.size());
+if (result == JOptionPane.OK_OPTION) {
+    // Get the class name entered by the user
+    String cName = clss.getText();
 
-    void displayTimetable(JTextArea textArea) {
-        if (timetable == null) {
-            textArea.setText("Please generate the timetable first.");
-        } else {
+    // Output the class name to verify
+    System.out.println(cName + " classesssss");
+
+    // Now you can use cName to retrieve the classId
+    int cId = retrieveClassId(cName);
+    
+    if (cId == -1) {
+        // Class does not exist, show a warning
+        JOptionPane.showMessageDialog(this, "Class does not exist. Please enter a valid class name.", "Warning", JOptionPane.WARNING_MESSAGE);
+        return; // Exit the method if the class does not exist
+    }
+    if(Login.res==3) {
+    	 if (!Students.c.equals(cName)) {
+    	        System.out.println("You do not belong to this class");
+    	        return;
+    	    }
+	  }
+        	  try {
+				connect();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // Make sure to connect to the database before retrieving data
+        	  String selectQuery = "SELECT day, classId, t1, t2, t3, t4, t5, t6, t7 FROM timetables WHERE classId=?";
+
+        	  try (PreparedStatement preparedStatement = con.prepareStatement(selectQuery)) {
+        		    preparedStatement.setInt(1, cId);
+        		    ResultSet resultSet = preparedStatement.executeQuery();
             // Create a panel for the timetable
             JPanel timetablePanel = new JPanel(new GridLayout(days + 1, classTimings.size() + 1));
     
@@ -201,6 +239,8 @@ public class GenerateTimetable extends JFrame{
                 timetablePanel.add(timingLabel);
             }
     
+            // Move the cursor to the first row
+            boolean hasData = resultSet.next();
             // Populate the timetable panel with data
             for (int day = 0; day < days; day++) {
                 JLabel dayLabel = new JLabel("Day " + (day + 1));
@@ -208,7 +248,7 @@ public class GenerateTimetable extends JFrame{
                 timetablePanel.add(dayLabel);
     
                 for (int classIndex = 0; classIndex < classTimings.size(); classIndex++) {
-                    String className = timetable.getClass(day, classIndex);
+                    String className = resultSet.getString(classIndex + 3);
                     JLabel classLabel = new JLabel(className != null ? className : "FREE");
                     classLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     
@@ -221,7 +261,11 @@ public class GenerateTimetable extends JFrame{
     
                     timetablePanel.add(classLabel);
                 }
+                // Move to the next row
+        //        hasData = resultSet.next();
             }
+            
+        	    
     
             // Create a scroll pane for the timetable panel
             JScrollPane scrollPane = new JScrollPane(timetablePanel);
@@ -233,58 +277,160 @@ public class GenerateTimetable extends JFrame{
             timetableFrame.setLocationRelativeTo(this); // Center the frame relative to the main frame
             timetableFrame.add(scrollPane);
             timetableFrame.setVisible(true);
-        }
+        	    } catch (SQLException e) {
+        	        e.printStackTrace();
+        	    }
+        
+}   
     }
-    private int retrieveClassId(String className) throws SQLException {
-        int classId = -1; // Initialize classId to a default value
+    
+    void editTimetable(JTextArea textArea) throws SQLException {
+        JTextField clss = new JTextField();
+        JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+        inputPanel.add(new JLabel("Enter the class:"));
+        inputPanel.add(clss);
 
-        String query = "SELECT class_id FROM class WHERE name = ?";
-        try (PreparedStatement pst = con.prepareStatement(query)) {
-            pst.setString(1, className);
+        int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit Timetable", JOptionPane.OK_CANCEL_OPTION);
 
-            try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    classId = rs.getInt("class_id");
+        if (result == JOptionPane.OK_OPTION) {
+            String className = clss.getText();
+            int classId = retrieveClassId(className);
+
+            if (classId == -1) {
+                JOptionPane.showMessageDialog(this, "Class does not exist. Please enter a valid class name.", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                connect();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            String selectQuery = "SELECT day, classId, t1, t2, t3, t4, t5, t6, t7 FROM timetables WHERE classId=?";
+            String updateQuery = "UPDATE timetables SET t1=?, t2=?, t3=?, t4=?, t5=?, t6=?, t7=? WHERE day=? AND classId=?";
+
+            try (PreparedStatement selectStatement = con.prepareStatement(selectQuery);
+                 PreparedStatement updateStatement = con.prepareStatement(updateQuery)) {
+
+                selectStatement.setInt(1, classId);
+                ResultSet resultSet = selectStatement.executeQuery();
+
+               JPanel editPanel = new JPanel(new GridLayout(days + 1, classTimings.size() + 1));
+//                editPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//
+               editPanel.add(new JLabel("Time/Day"));
+//
+//                for (String timing : classTimings) {
+//                    JLabel timingLabel = new JLabel(timing);
+//                    timingLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//                    editPanel.add(timingLabel);
+//                }
+//
+//                for (int day = 0; day < days; day++) {
+//                    JLabel dayLabel = new JLabel("Day " + (day + 1));
+//                    dayLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//                    editPanel.add(dayLabel);
+//
+//                    for (int classIndex = 0; classIndex < classTimings.size(); classIndex++) {
+//                        String classNameInDb = resultSet.getString(classIndex + 3);
+//                        JTextField classField = new JTextField(classNameInDb != null ? classNameInDb : "FREE");
+//                        classField.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//                        editPanel.add(classField);
+//                    }
+//
+//                    resultSet.next();
+//                }
+
+                int editResult = JOptionPane.showConfirmDialog(this, editPanel, "Edit Timetable", JOptionPane.OK_CANCEL_OPTION);
+
+                if (editResult == JOptionPane.OK_OPTION) {
+                    JTextField dayField = new JTextField();
+                    JTextField classIndexField = new JTextField();
+
+                    JPanel addSubjectPanel = new JPanel(new GridLayout(0, 2));
+                    addSubjectPanel.add(new JLabel("Enter the day where you want to add a subject:"));
+                    addSubjectPanel.add(dayField);
+                    addSubjectPanel.add(new JLabel("Enter the class index where you want to add a subject:"));
+                    addSubjectPanel.add(classIndexField);
+
+                    int addSubjectResult = JOptionPane.showConfirmDialog(this, addSubjectPanel, "Add Subject", JOptionPane.OK_CANCEL_OPTION);
+
+                    if (addSubjectResult == JOptionPane.OK_OPTION) {
+                        try {
+                            int selectedDay = Integer.parseInt(dayField.getText());
+                            int selectedClassIndex = Integer.parseInt(classIndexField.getText());
+
+//                            if (selectedDay < 1 || selectedDay > days || selectedClassIndex < 1 || selectedClassIndex > classTimings.size()) {
+//                                JOptionPane.showMessageDialog(this, "Invalid day or class index. Please enter valid values.", "Warning", JOptionPane.WARNING_MESSAGE);
+//                                return;
+//                            }
+System.out.println(resultSet.getString(selectedClassIndex + 2));
+                            // Check if the selected slot is null
+                            if (resultSet.getString(selectedClassIndex + 2) == null) {
+                                // Slot is null, prompt user for subject name
+                                String newSubjectName = JOptionPane.showInputDialog(this, "Enter the subject name to be added:");
+
+                                // Update the database with the new subject
+                                updateStatement.setString(selectedClassIndex + 1, newSubjectName);
+                                updateStatement.setInt(classTimings.size() + 1, selectedDay);
+                                updateStatement.setInt(classTimings.size() + 2, classId);
+                                updateStatement.addBatch();
+
+                                // Execute the batch update
+                                updateStatement.executeBatch();
+                                JOptionPane.showMessageDialog(this, "Subject added successfully.");
+
+                            } else {
+                                // Slot is not null, display a warning
+                                JOptionPane.showMessageDialog(this, "Selected slot is already occupied. Cannot add a new subject.", "Warning", JOptionPane.WARNING_MESSAGE);
+                            }
+
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(this, "Please enter valid numbers for day and class index.", "Warning", JOptionPane.WARNING_MESSAGE);
+                        }
+                    }
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
-
-        return classId;
     }
-	
+
 	
 	public void connect() throws SQLException {
 		//ENTER PORT, USER, PASSWORD.
-		//String str1 = "SELECT * FROM user WHERE prio = 1";
+		String str1 = "SELECT * FROM user WHERE prio = 1";
 		String url = "jdbc:mysql://localhost:3306/timetable";
 		String user = "root";
 		String pass = "W7301@jqir#A";
 
 		con = DriverManager.getConnection(url, user, pass);
 	}
-	
-	public void insertTimetable(int classId, List<String> timetableData) {
-	    String insertQuery = "INSERT INTO timetable_data (class_id, day, timing, subject) VALUES (?, ?, ?, ?)";
+	 private int retrieveClassId(String className) throws SQLException {
+		 System.out.println(className+"class\n");
+			connect();
+			    int classId = -1; // Initialize classId to a default value
+			    try {
+			    String query = "SELECT id FROM class WHERE name = ?";
+			    try (PreparedStatement pst = con.prepareStatement(query)) {
+			        pst.setString(1, className);
 
-	    try (PreparedStatement pst = con.prepareStatement(insertQuery)) {
-	        for (int day = 0; day < timetableData.size(); day++) {
-	            for (int classTime = 0; classTime < timetableData.get(day).length(); classTime++) {
-	                String subject = timetableData.get(day).charAt(classTime) + "";
-	                pst.setInt(1, classId);
-	                pst.setString(2,  "Day " + (day + 1));
-	                pst.setInt(3, classTime + 1);
-	                pst.setString(4, subject);
-	                pst.executeUpdate();
-	            }
-	        }
-	        System.out.println("Timetable data inserted successfully.");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        System.out.println("Error inserting timetable data: " + e.getMessage());
+			        try (ResultSet rs = pst.executeQuery()) {
+			            if (rs.next()) {
+			                classId = rs.getInt("id");
+			            }
+			        }
+			    }
+
+			    System.out.println(classId+"classid\n"); 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 return classId;
 	    }
-	}
 
-}	
 class Subject {
     String name;
     int credits;
@@ -297,11 +443,11 @@ class Subject {
 
 class Timetable {
     String[][] schedule;
-    private String[][] timetableData;
+
     public Timetable(int days, int classTimings) {
         schedule = new String[days][classTimings];
-        timetableData = new String[days][classTimings]; // Initialize the timetableData array
     }
+
     public void addClass(int day, int classIndex, String className) {
         schedule[day][classIndex] = className;
     }
@@ -313,36 +459,6 @@ class Timetable {
     public void displayTimetable(JTextArea textArea) {
         // Implement your code for displaying the timetable in the text area
     }
-    
+}}
 
-    public List<String> getTimetableData() {
-        List<String> timetableList = new ArrayList<>();
-
-        for (int day = 0; day < schedule.length; day++) {
-            StringBuilder row = new StringBuilder();
-            for (int classTime = 0; classTime < schedule[day].length; classTime++) {
-                String subject = schedule[day][classTime];
-                row.append(subject != null ? subject : " ");
-            }
-            timetableList.add(row.toString());
-        }
-
-        return timetableList;
-    }
-    public List<String> scheduleToList() {
-        List<String> timetableList = new ArrayList<>();
-
-        for (int day = 0; day < schedule.length; day++) {
-            StringBuilder row = new StringBuilder();
-            for (int classTime = 0; classTime < schedule[day].length; classTime++) {
-                String subject = schedule[day][classTime];
-                row.append(subject != null ? subject : " ");
-            }
-            timetableList.add(row.toString());
-        }
-
-        return timetableList;
-    }
-
-   
-}
+//*******************************

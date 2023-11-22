@@ -20,10 +20,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class TeacherView {
 	public void tcView(int id) throws SQLException {
-		
+		GenerateTimetable t = new GenerateTimetable();
 		JFrame frame = new JFrame();
 		Font btn = new Font("Times New Roman", Font.BOLD, 20);
 
@@ -96,22 +98,25 @@ public class TeacherView {
 		
 		//----------------------ADD Timetable----------------------------
 		JButton addtt = new JButton("VIEW TIMETABLE");
+		 JTextArea textArea = new JTextArea();
+	        textArea.setEditable(false); // Make the text area read-only
+	        JScrollPane scrollPane = new JScrollPane(textArea);
 		addtt.setBounds(150, 200, 650, 60);
 		addtt.setFont(btn);
 		addtt.setBackground(Color.decode("#DEE4E7"));
 		addtt.setForeground(Color.decode("#37474F"));
 		 layeredPane.add(addtt, JLayeredPane.MODAL_LAYER);
-//		addtt.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				Addtt addatt = new Addtt();
-//				try {
-//					addatt.addView();
-//				} catch (SQLException e1) {
-//					e1.printStackTrace();
-//				}
-//			}
-//		});
+		addtt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+				try {
+					t.displayTimetable(textArea);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		//----------------------------------------------------------
 		
 		//----------------------EDIT TIMETABLE----------------------------
@@ -121,17 +126,17 @@ public class TeacherView {
 		edittt.setBackground(Color.decode("#DEE4E7"));
 		edittt.setForeground(Color.decode("#37474F"));
 		 layeredPane.add(edittt, JLayeredPane.MODAL_LAYER);
-//		edittt.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				EditAttendance editatt = new EditAttendance();
-//				try {
-//					editatt.editView();
-//				} catch (SQLException e1) {
-//					e1.printStackTrace();
-//				}
-//			}
-//		});
+		edittt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+				try {
+					t.editTimetable(textArea);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		//----------------------------------------------------------
 		
 		//-------------------------------------------------------

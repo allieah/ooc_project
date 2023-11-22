@@ -27,6 +27,7 @@ import javax.swing.JTextArea;
 
 public class Home{
 	GenerateTimetable addtimet = new GenerateTimetable();
+	GenerateTimetable addatt = new GenerateTimetable();
 	public void homeView(int id) throws SQLException {
 		JFrame frame = new JFrame();
 		Font btn = new Font("Times New Roman", Font.BOLD, 20);
@@ -149,9 +150,19 @@ public class Home{
 		addtimetable.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			//	TimetableGenerator addtimet = new TimetableGenerator();
-				addtimet.generateTimetable();
-				addtimet.displayTimetable(textArea);
+				
+				try {
+					addatt.generateTimetable();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					addatt.displayTimetable(textArea);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		//----------------------------------------------------------
@@ -168,12 +179,10 @@ public class Home{
 			public void actionPerformed(ActionEvent e) {
 				
 				try {
-					//	EditAttendance editatt = new EditAttendance();
-				//	TimetableGenerator viewtimet = new TimetableGenerator();
-					//editatt.editView();
-					addtimet.displayTimetable(textArea);
-		            // Your implementation for editing attendance
-		          //  System.out.println("Editing attendance...");
+					addatt.editTimetable( textArea);
+					addatt.displayTimetable(textArea);
+					
+		            
 		        } catch (Exception e1) {
 		            e1.printStackTrace();
 		        }
@@ -225,7 +234,7 @@ public class Home{
 		
 		//----------------------CLASS----------------------------
 		JButton classes = new JButton("ADD CLASS");
-		classes.setBounds(380, 450, 400, 60);
+		classes.setBounds(280, 450, 400, 60);
 		classes.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		classes.setBackground(Color.decode("#DEE4E7"));
 		classes.setForeground(Color.decode("#37474F"));

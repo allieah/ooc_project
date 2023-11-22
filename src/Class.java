@@ -131,7 +131,20 @@ public class Class{
 		 layeredPane.add(name, JLayeredPane.MODAL_LAYER);
 
 		//--------------------------------------------------------
-		
+		 //--------------------NO OF DAYS-------------------------------
+	        JLabel daysLabel = new JLabel("NO OF DAYS PER WEEK: ");
+	        daysLabel.setFont(text);
+	        daysLabel.setBounds(25, 330, 300, 20);
+	        daysLabel.setForeground(Color.decode("#DEE4E7"));
+	        layeredPane.add(daysLabel, JLayeredPane.MODAL_LAYER);
+
+	        JTextField daysField = new JTextField();
+	        daysField.setBounds(25, 360, 50, 25);
+	        daysField.setBackground(Color.decode("#DEE4E7"));
+	        daysField.setFont(text);
+	        daysField.setForeground(Color.decode("#37474F"));
+	        daysField.setEditable(false);
+	        layeredPane.add(daysField, JLayeredPane.MODAL_LAYER);
 		//--------------------SAVEBUTTON---------------------------
 		JButton save = new JButton("SAVE");
 		save.setBounds(25, 500, 125, 50);
@@ -146,7 +159,7 @@ public class Class{
 			public void actionPerformed(ActionEvent e) {
 				if(check == 1) {
 					try {
-						adder(Integer.parseInt(idbox.getText()), name.getText());
+						 adder(Integer.parseInt(idbox.getText()), name.getText(), Integer.parseInt(daysField.getText()));
 					}
 					catch (SQLException e1) {
 						e1.printStackTrace();
@@ -155,17 +168,18 @@ public class Class{
 				else if(check == 2) {
 					save.setEnabled(false);
 					try {
-						editor(Integer.parseInt(idbox.getText()), name.getText());
+						  editor(Integer.parseInt(idbox.getText()), name.getText(), Integer.parseInt(daysField.getText()));
 					}
 					catch (SQLException e1) {
 						e1.printStackTrace();
 					}
 				}
 				try {
-					idbox.setText(String.valueOf(getid()));
+					 idbox.setText(String.valueOf(getid()));
 					edit.setEnabled(false);
 					delete.setEnabled(false);
 					name.setText("");
+					  daysField.setText("");
 					while(model.getRowCount() > 0)
 						model.removeRow(0);
 					tblupdt();
@@ -211,6 +225,7 @@ public class Class{
 				delete.setEnabled(false);
 				save.setEnabled(true);
 				name.setEditable(true);
+				daysField.setEditable(true);
 				check = 1;
 				try {
 					idbox.setText(String.valueOf(getid()));
@@ -261,9 +276,11 @@ public class Class{
 		model = (DefaultTableModel)table.getModel();
 		model.addColumn("ID");
 		model.addColumn("NAME");
+		model.addColumn("DAYS");
 		tblupdt();
 		table.getColumnModel().getColumn(0).setPreferredWidth(100);
-		table.getColumnModel().getColumn(1).setPreferredWidth(300);
+		table.getColumnModel().getColumn(1).setPreferredWidth(200);
+		table.getColumnModel().getColumn(2).setPreferredWidth(100);
 		JScrollPane scPane=new JScrollPane(table);
 		scPane.setBounds(500, 50, 480, 525);
 		 layeredPane.add(scPane, JLayeredPane.MODAL_LAYER);
@@ -277,6 +294,7 @@ public class Class{
 				int row = table.getSelectedRow();
 				idbox.setText(String.valueOf(table.getModel().getValueAt(row, 0)));
 				name.setText(String.valueOf(table.getModel().getValueAt(row, 1)));
+				daysField.setText(String.valueOf(table.getModel().getValueAt(row, 2)));
 				edit.setEnabled(true);
 				save.setEnabled(false);
 				delete.setEnabled(true);
@@ -304,6 +322,7 @@ public class Class{
 				model.addRow(new Object[0]);
 				model.setValueAt(res.getInt("id"), i, 0);
 		        model.setValueAt(res.getString("name"), i, 1);
+		        model.setValueAt(res.getString("day"), i, 2);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -333,20 +352,22 @@ public class Class{
 		return rst;
 	}
 	
-	public void adder(int id, String name) throws SQLException {
-		String adding = "insert into class values ("+id+", '"+name+"')";
-        Statement stm = con.createStatement();
-        stm.executeUpdate(adding);
-	}
+	 public void adder(int id, String name, int days) throws SQLException {
+	        String adding = "insert into class values (" + id + ", '" + name + "', " + days + ")";
+	        Statement stm = con.createStatement();
+	        stm.executeUpdate(adding);
+	    }
+
+	  
 	
 	public void deleter(int id) throws SQLException {
 		String del = "DELETE FROM class WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(del);
 	}
-	public void editor(int id, String name) throws SQLException {
-		String update = "UPDATE class SET name = '"+name+"'WHERE id = "+id;
-        Statement stm = con.createStatement();
-        stm.executeUpdate(update);
-	}
+	 public void editor(int id, String name, int days) throws SQLException {
+	        String update = "UPDATE class SET name = '" + name + "', days = " + days + " WHERE id = " + id;
+	        Statement stm = con.createStatement();
+	        stm.executeUpdate(update);
+	    }
 }
