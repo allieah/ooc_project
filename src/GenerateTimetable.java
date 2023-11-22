@@ -263,81 +263,28 @@ public class GenerateTimetable extends JFrame{
 		con = DriverManager.getConnection(url, user, pass);
 	}
 	
-	public void insertTimetable(int classId, List<String> timetableData) throws SQLException {
+	public void insertTimetable(int classId, List<String> timetableData) {
 	    String insertQuery = "INSERT INTO timetable_data (class_id, day, timing, subject) VALUES (?, ?, ?, ?)";
 
 	    try (PreparedStatement pst = con.prepareStatement(insertQuery)) {
-	     //   int classId; // You need to set the actual class ID for each class
-
 	        for (int day = 0; day < timetableData.size(); day++) {
 	            for (int classTime = 0; classTime < timetableData.get(day).length(); classTime++) {
 	                String subject = timetableData.get(day).charAt(classTime) + "";
-	                pst.setInt(1, classId); // Set the actual class ID
-	                pst.setInt(2, day + 1); // Assuming days are 1-indexed
-	                pst.setInt(3, classTime + 1); // Assuming class times are 1-indexed
+	                pst.setInt(1, classId);
+	                pst.setString(2,  "Day " + (day + 1));
+	                pst.setInt(3, classTime + 1);
 	                pst.setString(4, subject);
 	                pst.executeUpdate();
 	            }
 	        }
+	        System.out.println("Timetable data inserted successfully.");
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        System.out.println("Error inserting timetable data: " + e.getMessage());
 	    }
 	}
-}	
-	//////////////////////////////////////////////////////
-//	public ResultSet dbSearch(String classes) throws SQLException {
-//		String str1 = "SELECT * from students where class = '"+classes+"'";
-//		Statement stm = con.createStatement();
-//		ResultSet rst = stm.executeQuery(str1);
-//		return rst;
-//	}
-//	
-//	public String[] classEt() throws SQLException {
-//		String str1 = "SELECT name from class";
-//		Statement stm = con.createStatement();
-//		ResultSet rst = stm.executeQuery(str1);
-//		String[] rt = new String[25];
-//		int i=0;
-//		while(rst.next()) {
-//			rt[i] = rst.getString("name");
-//			i++;
-//		}
-//		return rt;
-//	}
-//	
-//	public void tblupdt(String classes) {
-//		for (int i=0; i < model.getRowCount(); i++) {
-//		    model.removeRow(i);
-//		    model.setRowCount(0);
-//		}
-//		try {
-//			ResultSet res = dbSearch(classes);
-//			for(int i=0; res.next(); i++) {
-//				model.addRow(new Object[0]);
-//				model.setValueAt(res.getInt("id"), i, 0);
-//		        model.setValueAt(res.getString("name"), i, 1);
-//		        model.setValueAt("Present", i, 2);
-//			}
-//		} catch (SQLException e1) {
-//			e1.printStackTrace();
-//		}
-//	}
-//	
-//	public void addItem(int id, String status, String date, String classes) throws SQLException {
-//		String adding = "INSERT INTO attend values("+id+", '"+date+"', '"+status+"', '"+classes+"')";
-//		Statement stm = con.createStatement();
-//        stm.executeUpdate(adding);
-//	}
-//	
-//	public boolean check(String classes, String dt) throws SQLException {
-//		String str1 = "select * from attend where class = '"+classes+"' AND dt = '"+dt+"'";
-//		Statement stm = con.createStatement();
-//		ResultSet rst = stm.executeQuery(str1);
-//		if(rst.next())
-//			return true;
-//		else 
-//			return false;
-//	}
-//}
 
+}	
 class Subject {
     String name;
     int credits;
@@ -367,14 +314,7 @@ class Timetable {
         // Implement your code for displaying the timetable in the text area
     }
     
-//    public void setTimetableData(List<String> timetableData) {
-//        for (int day = 0; day < timetableData.size(); day++) {
-//            String rowData = timetableData.get(day);
-//            for (int classTime = 0; classTime < rowData.length(); classTime++) {
-//                schedule[day][classTime] = String.valueOf(rowData.charAt(classTime));
-//            }
-//        }
-//    }
+
     public List<String> getTimetableData() {
         List<String> timetableList = new ArrayList<>();
 
