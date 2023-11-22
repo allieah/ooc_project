@@ -2,6 +2,9 @@
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -12,6 +15,7 @@ import java.sql.Statement;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -26,46 +30,73 @@ public class StudentView {
 	
 	public void stView(int id) throws SQLException {
 		
-		//------------------------CLOSE---------------------------
-		JLabel x = new JLabel("X");
-		x.setForeground(Color.decode("#37474F"));
-		x.setBounds(965, 10, 100, 20);
-		x.setFont(new Font("Times New Roman", Font.BOLD, 20));
-		frame.add(x);
-		x.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				System.exit(0);
-			}
-		});
-		//----------------------------------------------------------
-				
-		//-----------------------MINIMIZE-----------------------------
-		JLabel min = new JLabel("_");
-		min.setForeground(Color.decode("#37474F"));
-		min.setBounds(935, 0, 100, 20);
-		frame.add(min);
-		min.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				frame.setState(JFrame.ICONIFIED);
-			}
-		});
-		//-------------------------------------------------------------
-		
-		//------------------Panel----------------------------------
-		JPanel panel = new  JPanel();
-		panel.setBounds(0, 0, 1000, 35);
-		panel.setBackground(Color.decode("#DEE4E7"));
-		frame.add(panel);
-		//---------------------------------------------------------
+
+		  Color primaryColor = Color.decode("#2196F3");
+			//------------------Panel----------------------------------
+			   JLayeredPane layeredPane = new JLayeredPane();
+		        layeredPane.setBounds(0, 0, 1000, 600);	
+		        
+				JPanel panel1 = new  JPanel();
+				panel1.setBounds(0, 0, 1000, 35);
+				panel1.setBackground(Color.decode("#DAE8E7"));
+				  layeredPane.add(panel1, JLayeredPane.MODAL_LAYER);
+				//------------------Panel----------------------------------
+				  JPanel panel = new JPanel() {
+			            @Override
+			            protected void paintComponent(Graphics g) {
+			                super.paintComponent(g);
+			                Graphics2D g2d = (Graphics2D) g;
+			                GradientPaint gradient = new GradientPaint(0, 0, new Color(173, 216, 230), 0, getHeight(), primaryColor.darker());
+			                g2d.setPaint(gradient);
+			                g2d.fillRect(0, 15, getWidth(), getHeight());
+			            }
+			        };
+			        panel.setBounds(000, 15, 1000, 600);
+			        
+			        layeredPane.add(panel, JLayeredPane.DEFAULT_LAYER);
+			        JLabel min = new JLabel("_");
+					min.setForeground(Color.decode("#37474F"));
+					min.setBounds(935, 0, 100, 20);
+					layeredPane.add(min, JLayeredPane.POPUP_LAYER);
+					min.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							frame.setState(JFrame.ICONIFIED);
+						}
+					});
+			    	//------------------------CLOSE---------------------------
+					JLabel x = new JLabel("X");
+					x.setForeground(Color.decode("#37474F"));
+					x.setBounds(965, 10, 100, 20);
+					x.setFont(new Font("Times New Roman", Font.BOLD, 20));
+					  layeredPane.add(x, JLayeredPane.POPUP_LAYER);
+					x.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							System.exit(0);
+						}
+					});
+					//----------------------------------------------------------
+					
+					//-----------------------BACK---------------------------------
+					JLabel back = new JLabel("< BACK");
+					back.setForeground(Color.decode("#37474F"));
+					back.setFont(new Font("Times New Roman", Font.BOLD, 17));
+					back.setBounds(18, 10, 100, 20);
+					  layeredPane.add(back, JLayeredPane.POPUP_LAYER);
+					back.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							frame.dispose();
+						}
+					});
 		
 		//-------------------Welcome---------------------------------
 		JLabel welcome = new JLabel("Welcome "+getUser(id)+",");
 		welcome.setForeground(Color.decode("#DEE4E7"));
 		welcome.setBounds(10, 50, 250, 20);
 		welcome.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(welcome);
+		 layeredPane.add(welcome, JLayeredPane.MODAL_LAYER);
 		//-----------------------------------------------------------
 		
 		
@@ -78,7 +109,7 @@ public class StudentView {
 		scPane.setBounds(500, 50, 480, 525);
 		table.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		table.setRowHeight(50);
-		frame.add(scPane);
+		 layeredPane.add(scPane, JLayeredPane.MODAL_LAYER);
 		//------------------------------------------------------
 		
 		//--------------------------INFO------------------------
@@ -86,42 +117,42 @@ public class StudentView {
 		totalclass.setBounds(25, 180, 250, 20);
 		totalclass.setForeground(Color.decode("#DEE4E7"));
 		totalclass.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(totalclass);
+		 layeredPane.add(totalclass, JLayeredPane.MODAL_LAYER);
 		JLabel ttbox = new JLabel("");
 		ttbox.setBounds(60, 230, 250, 20);
 		ttbox.setForeground(Color.decode("#DEE4E7"));
 		ttbox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(ttbox);
+		 layeredPane.add(ttbox, JLayeredPane.MODAL_LAYER);
 		JLabel classAtt = new JLabel("CLASSES ATTENDED : ");
 		classAtt.setBounds(25, 280, 250, 20);
 		classAtt.setForeground(Color.decode("#DEE4E7"));
 		classAtt.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(classAtt);
+		 layeredPane.add(classAtt, JLayeredPane.MODAL_LAYER);
 		JLabel atbox = new JLabel("");
 		atbox.setBounds(60, 330, 250, 20);
 		atbox.setForeground(Color.decode("#DEE4E7"));
 		atbox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(atbox);
+		 layeredPane.add(atbox, JLayeredPane.MODAL_LAYER);
 		JLabel classAbs = new JLabel("CLASSES MISSED : ");
 		classAbs.setBounds(25, 380, 250, 20);
 		classAbs.setForeground(Color.decode("#DEE4E7"));
 		classAbs.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(classAbs);
+		 layeredPane.add(classAbs, JLayeredPane.MODAL_LAYER);
 		JLabel mtbox = new JLabel("");
 		mtbox.setBounds(60, 430, 250, 20);
 		mtbox.setForeground(Color.decode("#DEE4E7"));
 		mtbox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(mtbox);
+		 layeredPane.add(mtbox, JLayeredPane.MODAL_LAYER);
 		JLabel AttPer = new JLabel("ATTENDANCE PERCENTAGE : ");
 		AttPer.setBounds(25, 480, 300, 20);
 		AttPer.setForeground(Color.decode("#DEE4E7"));
 		AttPer.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(AttPer);
+		 layeredPane.add(AttPer, JLayeredPane.MODAL_LAYER);
 		JLabel prbox = new JLabel("");
 		prbox.setBounds(60, 530, 250, 20);
 		prbox.setForeground(Color.decode("#DEE4E7"));
 		prbox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-		frame.add(prbox);
+		 layeredPane.add(prbox, JLayeredPane.MODAL_LAYER);
 		//------------------------------------------------------
 		
 		//----------------------SETVALUES---------------------------
@@ -140,7 +171,7 @@ public class StudentView {
 		frame.setLocationRelativeTo(null);  
 		frame.setVisible(true);
 		frame.setFocusable(true);
-		frame.getContentPane().setBackground(Color.decode("#37474F"));
+		 frame.setContentPane(layeredPane);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//--------------------------------------------------------------
 	}
@@ -183,7 +214,7 @@ public class StudentView {
 		rst.next();
 		x[2] = rst.getInt("abs");
 		x[0] = x[1] + x[2];
-		x[3] = (x[1]*100)/x[0];
+	//	x[3] = (x[1]*100)/x[0];
 		tblupdt(id);
 		return x;
 	}

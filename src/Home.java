@@ -26,7 +26,7 @@ import javax.swing.JTextArea;
 
 
 public class Home{
-	TimetableGenerator addtimet = new TimetableGenerator();
+	GenerateTimetable addtimet = new GenerateTimetable();
 	public void homeView(int id) throws SQLException {
 		JFrame frame = new JFrame();
 		Font btn = new Font("Times New Roman", Font.BOLD, 20);
