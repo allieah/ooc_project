@@ -38,12 +38,33 @@ public class Home{
 	        
 	        JLayeredPane layeredPane = new JLayeredPane();
 	        layeredPane.setBounds(0, 0, 1000, 600);	
+	        
+			JPanel panel1 = new  JPanel();
+			panel1.setBounds(0, 0, 1000, 35);
+			panel1.setBackground(Color.decode("#DAE8E7"));
+			  layeredPane.add(panel1, JLayeredPane.MODAL_LAYER);
+			//------------------Panel----------------------------------
+			  JPanel panel = new JPanel() {
+		            @Override
+		            protected void paintComponent(Graphics g) {
+		                super.paintComponent(g);
+		                Graphics2D g2d = (Graphics2D) g;
+		                GradientPaint gradient = new GradientPaint(0, 0, new Color(173, 216, 230), 0, getHeight(), primaryColor.darker());
+		                g2d.setPaint(gradient);
+		                g2d.fillRect(0, 15, getWidth(), getHeight());
+		            }
+		        };
+		        panel.setBounds(000, 15, 1000, 600);
+		        
+		        layeredPane.add(panel, JLayeredPane.DEFAULT_LAYER);
+		           
+	        
 		//------------------------CLOSE---------------------------
 		JLabel x = new JLabel("X");
 		x.setForeground(Color.decode("#37474F"));
 		x.setBounds(980, 10, 100, 20);
 		x.setFont(new Font("Times New Roman", Font.BOLD, 20));
-		 layeredPane.add(x, JLayeredPane.MODAL_LAYER);
+		 layeredPane.add(x, JLayeredPane.POPUP_LAYER);
 		x.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -52,13 +73,23 @@ public class Home{
 		});
 		//----------------------------------------------------------
         
-     
+		JLabel back = new JLabel("LOGOUT");
+		back.setForeground(Color.decode("#37474F"));
+		back.setFont(new Font("Times New Roman", Font.BOLD, 17));
+		back.setBounds(18, 10, 100, 20);
+		  layeredPane.add(back, JLayeredPane.POPUP_LAYER);
+		back.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				frame.dispose();
+			}
+		});
    
 		//-----------------------MINIMIZE-----------------------------
 		JLabel min = new JLabel("_");
 		min.setForeground(Color.decode("#37474F"));
 		min.setBounds(935, 0, 100, 20);
-		layeredPane.add(min, JLayeredPane.MODAL_LAYER);
+		layeredPane.add(min, JLayeredPane.POPUP_LAYER);
 		min.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -66,22 +97,7 @@ public class Home{
 			}
 		});
 		//-------------------------------------------------------------
-		
-		//------------------Panel----------------------------------
-		  JPanel panel = new JPanel() {
-	            @Override
-	            protected void paintComponent(Graphics g) {
-	                super.paintComponent(g);
-	                Graphics2D g2d = (Graphics2D) g;
-	                GradientPaint gradient = new GradientPaint(0, 0, new Color(173, 216, 230), 0, getHeight(), primaryColor.darker());
-	                g2d.setPaint(gradient);
-	                g2d.fillRect(0, 0, getWidth(), getHeight());
-	            }
-	        };
-	        panel.setBounds(000, 0, 1000, 600);
-	        
-	        layeredPane.add(panel, JLayeredPane.DEFAULT_LAYER);
-	        
+
 //			JPanel panelTop = new  JPanel();
 //			panel.setBounds(0, 0, 1000, 35);
 //			panel.setBackground(primaryColor);
@@ -98,8 +114,8 @@ public class Home{
 		//-----------------------------------------------------------
 		
 		//----------------------STUDENTS----------------------------
-		JButton students = new JButton("STUDENTS");
-		students.setBounds(150, 125, 700, 60);
+		JButton students = new JButton("ADD STUDENT");
+		students.setBounds(650,200, 200, 220);
 		students.setFont(btn);
 		students.setBackground(Color.decode("#DEE4E7"));
 		students.setForeground(Color.decode("#37474F"));
@@ -120,12 +136,12 @@ public class Home{
 		//----------------------------------------------------------
 		
 		//----------------------ADDATTENDANCE----------------------------
-		JButton addtimetable = new JButton("ADD timetable");
+		JButton addtimetable = new JButton("ADD TIMETABLE");
 		
 		
 		
 	       
-		addtimetable.setBounds(150, 250, 400, 60);
+		addtimetable.setBounds(200, 100, 250, 70);
 		addtimetable.setFont(btn);
 		addtimetable.setBackground(Color.decode("#DEE4E7"));
 		addtimetable.setForeground(Color.decode("#37474F"));
@@ -141,8 +157,8 @@ public class Home{
 		//----------------------------------------------------------
 		
 		//----------------------EDIT----------------------------
-		JButton editTimetable = new JButton("EDIT ATTENDANCE");
-		editTimetable.setBounds(600, 250, 250, 60);
+		JButton editTimetable = new JButton("EDIT TIMETABLE");
+		editTimetable.setBounds(500, 100, 250, 70);
 		editTimetable.setFont(btn);
 		editTimetable.setBackground(Color.decode("#DEE4E7"));
 		editTimetable.setForeground(Color.decode("#37474F"));
@@ -168,8 +184,8 @@ public class Home{
 		//----------------------------------------------------------
 		
 		//----------------------TEACHERS----------------------------
-		JButton teacher = new JButton("TEACHERS");
-		teacher.setBounds(150, 375, 700, 60);
+		JButton teacher = new JButton("ADD TEACHER");
+		teacher.setBounds(400, 200, 200, 220);
 		teacher.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		teacher.setBackground(Color.decode("#DEE4E7"));
 		teacher.setForeground(Color.decode("#37474F"));
@@ -188,8 +204,8 @@ public class Home{
 		//----------------------------------------------------------
 		
 		//----------------------USER----------------------------
-		JButton admin = new JButton("ADMIN");
-		admin.setBounds(150, 500, 250, 60);
+		JButton admin = new JButton("ADD ADMIN");
+		admin.setBounds(150, 200, 200, 220);
 		admin.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		admin.setBackground(Color.decode("#DEE4E7"));
 		admin.setForeground(Color.decode("#37474F"));
@@ -208,8 +224,8 @@ public class Home{
 		//----------------------------------------------------------
 		
 		//----------------------CLASS----------------------------
-		JButton classes = new JButton("CLASS");
-		classes.setBounds(450, 500, 400, 60);
+		JButton classes = new JButton("ADD CLASS");
+		classes.setBounds(380, 450, 400, 60);
 		classes.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		classes.setBackground(Color.decode("#DEE4E7"));
 		classes.setForeground(Color.decode("#37474F"));

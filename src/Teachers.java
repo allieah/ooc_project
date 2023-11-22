@@ -2,6 +2,9 @@
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -15,6 +18,7 @@ import java.sql.Statement;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -37,39 +41,71 @@ public class Teachers {
 
 		JFrame frame = new JFrame();
 		
-		//------------------------CLOSE---------------------------
-		JLabel x = new JLabel("X");
-		x.setForeground(Color.decode("#37474F"));
-		x.setBounds(965, 10, 100, 20);
-		x.setFont(new Font("Times New Roman", Font.BOLD, 20));
-		frame.add(x);
-		x.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				System.exit(0);
-			}
-		});
-		//----------------------------------------------------------
 		
-		//-----------------------BACK---------------------------------
-		JLabel back = new JLabel("< BACK");
-		back.setForeground(Color.decode("#37474F"));
-		back.setFont(new Font("Times New Roman", Font.BOLD, 17));
-		back.setBounds(18, 10, 100, 20);
-		frame.add(back);
-		back.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				frame.dispose();
-			}
-		});
+		  Color primaryColor = Color.decode("#2196F3");
+			//------------------Panel----------------------------------
+			   JLayeredPane layeredPane = new JLayeredPane();
+		        layeredPane.setBounds(0, 0, 1000, 600);	
+		        
+				JPanel panel1 = new  JPanel();
+				panel1.setBounds(0, 0, 1000, 35);
+				panel1.setBackground(Color.decode("#DAE8E7"));
+				  layeredPane.add(panel1, JLayeredPane.MODAL_LAYER);
+				//------------------Panel----------------------------------
+				  JPanel panel = new JPanel() {
+			            @Override
+			            protected void paintComponent(Graphics g) {
+			                super.paintComponent(g);
+			                Graphics2D g2d = (Graphics2D) g;
+			                GradientPaint gradient = new GradientPaint(0, 0, new Color(173, 216, 230), 0, getHeight(), primaryColor.darker());
+			                g2d.setPaint(gradient);
+			                g2d.fillRect(0, 15, getWidth(), getHeight());
+			            }
+			        };
+			        panel.setBounds(000, 15, 1000, 600);
+			        
+			        layeredPane.add(panel, JLayeredPane.DEFAULT_LAYER);
+		//------------------------CLOSE---------------------------
+			        JLabel min = new JLabel("_");
+					min.setForeground(Color.decode("#37474F"));
+					min.setBounds(935, 0, 100, 20);
+					layeredPane.add(min, JLayeredPane.POPUP_LAYER);
+					min.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							frame.setState(JFrame.ICONIFIED);
+						}
+					});
+			    	//------------------------CLOSE---------------------------
+					JLabel x = new JLabel("X");
+					x.setForeground(Color.decode("#37474F"));
+					x.setBounds(965, 10, 100, 20);
+					x.setFont(new Font("Times New Roman", Font.BOLD, 20));
+					  layeredPane.add(x, JLayeredPane.POPUP_LAYER);
+					x.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							System.exit(0);
+						}
+					});
+					//----------------------------------------------------------
+					
+					//-----------------------BACK---------------------------------
+					JLabel back = new JLabel("< BACK");
+					back.setForeground(Color.decode("#37474F"));
+					back.setFont(new Font("Times New Roman", Font.BOLD, 17));
+					back.setBounds(18, 10, 100, 20);
+					  layeredPane.add(back, JLayeredPane.POPUP_LAYER);
+					back.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							frame.dispose();
+						}
+					});
 		//--------------------------------------------------------------
 		
 		//------------------Panel----------------------------------
-		JPanel panel = new  JPanel();
-		panel.setBounds(0, 0, 1000, 35);
-		panel.setBackground(Color.decode("#DEE4E7"));
-		frame.add(panel);
+
 		//---------------------------------------------------------
 		
 		//----------------TABLE---------------------------------
@@ -89,7 +125,7 @@ public class Teachers {
 		table.getColumnModel().getColumn(2).setPreferredWidth(200);
 		JScrollPane scPane=new JScrollPane(table);
 		scPane.setBounds(500, 50, 480, 525);
-		frame.add(scPane);
+		 layeredPane.add(scPane, JLayeredPane.MODAL_LAYER);
 		//------------------------------------------------------
 		
 		//--------------------ID-----------------------------------
@@ -97,7 +133,7 @@ public class Teachers {
 		id.setFont(text);
 		id.setBounds(25, 60, 40, 20);
 		id.setForeground(Color.decode("#DEE4E7"));
-		frame.add(id);
+		 layeredPane.add(id, JLayeredPane.MODAL_LAYER);
 		JTextField idbox= new JTextField();
 		idbox.setBounds(60, 60, 50, 25);
 		idbox.setBackground(Color.decode("#DEE4E7"));
@@ -105,7 +141,7 @@ public class Teachers {
 		idbox.setForeground(Color.decode("#37474F"));
 		idbox.setEditable(false);
 		idbox.setText(String.valueOf(getid()));
-		frame.add(idbox);
+		 layeredPane.add(idbox, JLayeredPane.MODAL_LAYER);
 		//--------------------------------------------------------
 		
 		//---------------------USERNAME-------------------------
@@ -113,14 +149,14 @@ public class Teachers {
 		user.setFont(text);
 		user.setBounds(25, 120, 150, 20);
 		user.setForeground(Color.decode("#DEE4E7"));
-		frame.add(user);
+		layeredPane.add(user, JLayeredPane.MODAL_LAYER);
 		JTextField username= new JTextField();
 		username.setBounds(25, 160, 400, 35);
 		username.setBackground(Color.decode("#DEE4E7"));
 		username.setFont(text);
 		username.setForeground(Color.decode("#37474F"));
 		username.setEditable(false);
-		frame.add(username);
+		 layeredPane.add(username, JLayeredPane.MODAL_LAYER);
 		//------------------------------------------------------
 		
 		//-------------------NAME----------------------------------
@@ -128,14 +164,14 @@ public class Teachers {
 		nm.setFont(text);
 		nm.setBounds(25, 240, 150, 20);
 		nm.setForeground(Color.decode("#DEE4E7"));
-		frame.add(nm);
+		layeredPane.add(nm, JLayeredPane.MODAL_LAYER);
 		JTextField name= new JTextField();
 		name.setBounds(25, 270, 400, 35);
 		name.setBackground(Color.decode("#DEE4E7"));
 		name.setFont(text);
 		name.setForeground(Color.decode("#37474F"));
 		name.setEditable(false);
-		frame.add(name);
+		 layeredPane.add(name, JLayeredPane.MODAL_LAYER);
 		//--------------------------------------------------------
 		
 		//---------------------PASS--------------------------------
@@ -143,14 +179,14 @@ public class Teachers {
 		pass.setFont(text);
 		pass.setBounds(25, 350, 150, 20);
 		pass.setForeground(Color.decode("#DEE4E7"));
-		frame.add(pass);
+		 layeredPane.add(pass, JLayeredPane.MODAL_LAYER);
 		JTextField password= new JTextField();
 		password.setBounds(25, 380, 400, 35);
 		password.setBackground(Color.decode("#DEE4E7"));
 		password.setFont(text);
 		password.setForeground(Color.decode("#37474F"));
 		password.setEditable(false);
-		frame.add(password);
+		 layeredPane.add(password, JLayeredPane.MODAL_LAYER);
 		//-----------------------------------------------------------
 		
 		//--------------------SAVEBUTTON---------------------------
@@ -160,7 +196,7 @@ public class Teachers {
 		save.setBackground(Color.decode("#DEE4E7"));
 		save.setForeground(Color.decode("#37474F"));
 		save.setEnabled(false);
-		frame.add(save);
+		 layeredPane.add(save, JLayeredPane.MODAL_LAYER);
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -208,7 +244,7 @@ public class Teachers {
 		edit.setEnabled(false);
 		edit.setBackground(Color.decode("#DEE4E7"));
 		edit.setForeground(Color.decode("#37474F"));
-		frame.add(edit);
+		 layeredPane.add(edit, JLayeredPane.MODAL_LAYER);
 		edit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -228,7 +264,7 @@ public class Teachers {
 		add.setFont(btn);
 		add.setBackground(Color.decode("#DEE4E7"));
 		add.setForeground(Color.decode("#37474F"));
-		frame.add(add);
+		 layeredPane.add(add, JLayeredPane.MODAL_LAYER);
 		add.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -255,7 +291,7 @@ public class Teachers {
 		delete.setBackground(Color.decode("#DEE4E7"));
 		delete.setForeground(Color.decode("#37474F"));
 		delete.setEnabled(false);
-		frame.add(delete);
+		 layeredPane.add(delete, JLayeredPane.MODAL_LAYER);
 		delete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -308,7 +344,7 @@ public class Teachers {
 		frame.setLocationRelativeTo(null);  
 		frame.setVisible(true);
 		frame.setFocusable(true);
-		frame.getContentPane().setBackground(Color.decode("#37474F"));
+		 frame.setContentPane(layeredPane);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//--------------------------------------------------------------
 	}

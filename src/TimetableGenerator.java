@@ -289,57 +289,59 @@ public class TimetableGenerator extends JFrame {
     }
 
     void displayTimetable(JTextArea textArea) {
-       
-        
-            if (timetable == null) {
-                textArea.setText("Please generate the timetable first.");
-            } else {
-                textArea.setText("Timetable:\n");
-                String timetableStr = generateTimetableString(timetable, classTimings);
-                textArea.append(timetableStr);
-        
-                // Create a panel for the timetable
-                JPanel timetablePanel = new JPanel(new BorderLayout());
-        
-                // Create a border around the panel
-                timetablePanel.setBorder(BorderFactory.createTitledBorder("Timetable"));
-        
-                // Create a scroll pane for the text area
-                JScrollPane scrollPane = new JScrollPane(textArea);
-                timetablePanel.add(scrollPane, BorderLayout.CENTER);
-        
-                // Create a new frame to display the timetable
-                JFrame timetableFrame = new JFrame("Timetable");
-                timetableFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                timetableFrame.setSize(600, 400); // Adjust the size as needed
-                timetableFrame.setLocationRelativeTo(this); // Center the frame relative to the main frame
-                timetableFrame.add(timetablePanel);
-                timetableFrame.setVisible(true);
+        if (timetable == null) {
+            textArea.setText("Please generate the timetable first.");
+        } else {
+            // Create a panel for the timetable
+            JPanel timetablePanel = new JPanel(new GridLayout(days + 1, classTimings.size() + 1));
+    
+            // Add a border to the timetable panel
+            timetablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    
+            // Create labels for days and class timings
+            timetablePanel.add(new JLabel("Time/Day"));
+            for (String timing : classTimings) {
+                JLabel timingLabel = new JLabel(timing);
+                timingLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                timetablePanel.add(timingLabel);
             }
-        }
-        
-        
-        
-        // This method generates the timetable string based on your existing logic.
-        private String generateTimetableString(Timetable timetable, List<String> classTimings) {
-            StringBuilder timetableStr = new StringBuilder();
-            for (int day = 0; day < timetable.schedule.length; day++) {
-                timetableStr.append("Day ").append(day + 1).append(": ");
-                for (int classIndex = 0; classIndex < timetable.schedule[day].length; classIndex++) {
+    
+            // Populate the timetable panel with data
+            for (int day = 0; day < days; day++) {
+                JLabel dayLabel = new JLabel("Day " + (day + 1));
+                dayLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                timetablePanel.add(dayLabel);
+    
+                for (int classIndex = 0; classIndex < classTimings.size(); classIndex++) {
                     String className = timetable.getClass(day, classIndex);
+                    JLabel classLabel = new JLabel(className != null ? className : "FREE");
+                    classLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    
+                    // Set a blue background for non-free classes
                     if (className != null) {
-                        timetableStr.append(classTimings.get(classIndex)).append(" - ").append(className).append(" | ");
-                    } else {
-                        timetableStr.append("FREE | ");
-                    }
-                }
-                timetableStr.append("\n");
-            }
-            return timetableStr.toString();
-        
-        
-    }
+                        classLabel.setOpaque(true);
+                        classLabel.setBackground(new Color(173, 216, 230)); // Light blue color
 
+                    }
+    
+                    timetablePanel.add(classLabel);
+                }
+            }
+    
+            // Create a scroll pane for the timetable panel
+            JScrollPane scrollPane = new JScrollPane(timetablePanel);
+    
+            // Create a new frame to display the timetable
+            JFrame timetableFrame = new JFrame("Timetable");
+            timetableFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            timetableFrame.setSize(800, 600); // Adjust the size as needed
+            timetableFrame.setLocationRelativeTo(this); // Center the frame relative to the main frame
+            timetableFrame.add(scrollPane);
+            timetableFrame.setVisible(true);
+        }
+    }
+    
+    
     private void addExtraClass(JTextArea textArea) {
      
     if (timetable == null) {
@@ -457,15 +459,15 @@ public class TimetableGenerator extends JFrame {
 
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                TimetableGenerator app = new TimetableGenerator();
-                app.setVisible(true);
-            }
-        });
-    }
+//    public static void main(String[] args) {
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                TimetableGenerator app = new TimetableGenerator();
+//                app.setVisible(true);
+//            }
+//        });
+//    }
 
     class Subject {
         String name;
