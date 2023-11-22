@@ -181,7 +181,7 @@ public class GenerateTimetable extends JFrame{
         
     }
 
-	
+	//*****
 
     void displayTimetable(JTextArea textArea) {
         if (timetable == null) {
